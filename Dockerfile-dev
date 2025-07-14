@@ -41,5 +41,5 @@ ENV NODE_OPTIONS=--openssl-legacy-provider
 # Install Node dependencies & build
 RUN npm install && npm run build
 
-CMD ["php-fpm", "-F"]
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
 
