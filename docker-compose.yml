@@ -5,27 +5,38 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: laravel-vue-image
-    container_name: laravel-vue-app
+    environment:
+      - RUN_MIGRATIONS=true
+    image: laravel-vue-app
+    container_name: laravel-app
     volumes:
-      - .:/var/www/html
-    ports:
-      - "8000:8000"
+      - appdata:/var/www/html
+      - ./.env:/var/www/html/.env
     depends_on:
       - db
-  
-  db:
-    image: mysql:8
-    container_name: mysql-db
-    restart: always
-    environment:
-      MYSQL_DATABASE: laravel
-      MYSQL_USER: root
-      MYSQL_PASSWORD: 123456
-      MYSQL_ROOT_PASSWORD: 123456
-    volumes:
-      - mysql_data:/var/lib/mysql
+
+  webserver:
+    image: nginx:stable-alpine
+    container_name: nginx-server
     ports:
-      - "3306:3306"
+      - "80:80"
+    volumes:
+      - appdata:/var/www/html
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+
+  db:
+    image: mysql:8.0
+    container_name: mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: laravel
+    volumes:
+      - ./my.cnf:/etc/mysql/conf.d/my.cnf
+      - dbdata:/var/lib/mysql
+
 volumes:
-  mysql_data: 
+  appdata:
+  dbdata:
+
