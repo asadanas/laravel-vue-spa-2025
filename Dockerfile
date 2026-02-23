@@ -1,4 +1,7 @@
+# ============================================
 # Stage 1: Build frontend assets (Laravel Mix)
+# ============================================
+
 FROM node:16-alpine AS node-builder
 WORKDIR /app
 
@@ -9,17 +12,23 @@ COPY . .
 RUN npm run build
 
 
+# ==================================================
 # Stage 2: Build PHP deps + vendor (runs on PHP 8.2)
+# ==================================================
+
 FROM php:8.2-fpm-alpine AS php-builder
 
 RUN apk add --no-cache \
     git unzip \
     libpng-dev libjpeg-turbo-dev freetype-dev \
     libzip-dev libxml2-dev oniguruma-dev zlib-dev \
-    autoconf make g++ pkgconf $PHPIZE_DEPS
+    autoconf make g++ pkgconf $PHPIZE_DEPS \
+    re2c
 
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
-    docker-php-ext-install -j$(nproc) pdo_mysql mbstring exif pcntl bcmath gd zip
+    docker-php-ext-install -j$(nproc) pdo_mysql mbstring exif pcntl bcmath gd zip && \
+    pecl install redis && \
+    docker-php-ext-enable redis
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
@@ -33,7 +42,10 @@ RUN rm -f bootstrap/cache/config.php bootstrap/cache/packages.php bootstrap/cach
 RUN composer install --no-dev --prefer-dist --no-interaction --no-progress --optimize-autoloader
 
 
+# ===================================
 # Stage 3: Runtime APP (php-fpm only)
+# ===================================
+
 FROM php:8.2-fpm-alpine AS app
 
 RUN apk add --no-cache \
@@ -41,9 +53,11 @@ RUN apk add --no-cache \
     libpng libjpeg-turbo freetype \
     libzip libxml2 oniguruma zlib \
   && apk add --no-cache --virtual .build-deps \
-    $PHPIZE_DEPS libpng-dev libjpeg-turbo-dev freetype-dev libzip-dev libxml2-dev oniguruma-dev \
+    $PHPIZE_DEPS libpng-dev libjpeg-turbo-dev freetype-dev libzip-dev libxml2-dev oniguruma-dev re2c \
   && docker-php-ext-configure gd --with-freetype --with-jpeg \
   && docker-php-ext-install -j$(nproc) pdo_mysql mbstring exif pcntl bcmath gd zip \
+  && pecl install redis \
+  && docker-php-ext-enable redis \
   && apk del .build-deps
 
 WORKDIR /var/www/html
@@ -57,7 +71,7 @@ COPY --from=node-builder /app/public /var/www/html/public
 # Safety: remove stale cache again (in case it existed)
 RUN rm -f bootstrap/cache/config.php bootstrap/cache/packages.php bootstrap/cache/services.php || true
 
-# Ensure writable directories exist + correct ownership/permissions
+# Ensure writable directories exist + correct ownership/permissions (FIXED)
 RUN mkdir -p \
       storage/logs \
       storage/framework/cache \
@@ -65,20 +79,28 @@ RUN mkdir -p \
       storage/framework/sessions \
       storage/framework/views \
       bootstrap/cache \
- && rm -f storage/logs/laravel.log || true \
  && chown -R www-data:www-data storage bootstrap/cache \
- && chmod -R ug+rwX storage bootstrap/cache
+ && chmod -R ug+rwX storage bootstrap/cache \
+ && rm -f storage/logs/laravel.log || true
 
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Run as non-root user
+USER www-data
 
 ENTRYPOINT ["entrypoint.sh"]
 CMD ["php-fpm", "-F"]
 
 
-# Stage 4: NGINX image (static + fastcgi proxy)
+# ==============
+# Stage 4: NGINX
+# ==============
+
 FROM nginx:1.25-alpine AS nginx
 WORKDIR /var/www/html
 COPY docker/nginx/default.conf /etc/nginx/conf.d/default.conf
 COPY --from=node-builder /app/public /var/www/html/public
 
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
