@@ -12,7 +12,7 @@
 
 ## What Was Added (Docker Layer)
 The following files/folders were added by @asadanas (Md. Asaduzzaman Anas) to enable containerization:
-
+```
 laravel-vue-spa-2025/
 ├── Dockerfile                    # Multi-stage production build
 ├── docker-compose.yml            # Local development orchestration
@@ -22,8 +22,8 @@ laravel-vue-spa-2025/
 │   └── nginx/
 │       └── default.conf          # Nginx reverse proxy config (FastCGI to PHP-FPM)
 └── README.md                     # This installation guide
-
-### All other files belong to the original https://github.com/cretueusebiu/laravel-vue-spa.git repository.
+```
+> All other files belong to the original https://github.com/cretueusebiu/laravel-vue-spa.git repository.
 
 ## Installation Guide
 
@@ -68,7 +68,7 @@ php artisan jwt:secret
 ### Edit these lines in .env:
 - APP_KEY=<your_app_key>
 - DB_CONNECTION=mysql
-- DB_HOST=127.0.0.1
+- DB_HOST=<database_IP>
 - DB_PORT=3306
 - DB_DATABASE=laravel
 - DB_USERNAME=<your_username>
@@ -98,7 +98,7 @@ php artisan serve --host=<Interface_IP or localhost> --port=8080
 Use this method for a consistent, isolated environment that matches production.
 
 ### Prerequisites
-Install Docker & Docker Compose by following link. 
+Install Docker & Docker Compose by following link.
 
 https://docs.docker.com/engine/install/
 
@@ -127,7 +127,7 @@ cp .env.example .env
 
 ### 3. Build and start all services
 ### Dependencies are installed during build (no manual composer/npm needed)
-### Migrations run automatically if RUN_MIGRATIONS=true into docker-compose yaml. 
+### Migrations run automatically if RUN_MIGRATIONS=true into docker-compose yaml.
 ```bash
 docker compose up -d --build
 ```
@@ -148,3 +148,4 @@ docker compose down -v
 ## Attribution
 ### Original Project
 This application is built upon the laravel-vue-spa https://github.com/cretueusebiu/laravel-vue-spa.git repository by @cretueusebiu (Eusebiu Cretu).
+
