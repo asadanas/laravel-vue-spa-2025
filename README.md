@@ -95,7 +95,7 @@ php artisan serve --host=<Interface_IP or localhost> --port=8080
 ### 11. Access the application
 Frontend: http://<Interface_IP or localhost>:8000
 
-## Option 2: Docker Installation (Recommended)
+# Option 2: Docker Installation (Recommended)
 Use this method for a consistent, isolated environment that matches production.
 
 ### Prerequisites
