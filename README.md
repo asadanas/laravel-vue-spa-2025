@@ -92,7 +92,7 @@ npm run build
 php artisan serve --host=<Interface_IP or localhost> --port=8080
 ```
 ### 11. Access the application
-### Frontend: http://<Interface_IP or localhost>:8000
+Frontend: http://<Interface_IP or localhost>:8000
 
 ## Option 2: Docker Installation (Recommended)
 Use this method for a consistent, isolated environment that matches production.
@@ -126,8 +126,8 @@ cp .env.example .env
 - JWT_SECRET=<your_jwt_secret>
 
 ### 3. Build and start all services
-### Dependencies are installed during build (no manual composer/npm needed)
-### Migrations run automatically if RUN_MIGRATIONS=true into docker-compose yaml.
+Dependencies are installed during build (no manual composer/npm needed)
+Migrations run automatically if RUN_MIGRATIONS=true into docker-compose yaml.
 ```bash
 docker compose up -d --build
 ```
@@ -135,10 +135,10 @@ docker compose up -d --build
 ```bash
 docker compose ps
 ```
-### Expected: app, nginx, db, redis all show "Up (healthy)"
+Expected: app, nginx, db, redis all show "Up (healthy)"
 
 ### 5. Access the application
-### Frontend: http://<Interface_IP>:8080
+Frontend: http://<Interface_IP>:8080
 
 ### 6. Remove all the services
 ```bash
