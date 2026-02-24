@@ -29,7 +29,7 @@ laravel-vue-spa-2025/
 
 Choose one of the two methods below to install the application in your test environment.
 
-### Option 1: Traditional Installation (Without Docker)
+# Option 1: Traditional Installation (Without Docker)
 
 Use this method if you prefer to run Laravel/Vue directly on your host machine.
 
