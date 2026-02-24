@@ -27,12 +27,13 @@ laravel-vue-spa-2025/
 
 ## Installation Guide
 
+Choose one of the two methods below to install the application in your test environment.
+
 ### Option 1: Traditional Installation (Without Docker)
 
 Use this method if you prefer to run Laravel/Vue directly on your host machine.
 
 ### Prerequisites
-Choose one of the two methods below to install the application in your test environment.
 
 - PHP 8.2 with extensions
 - Composer
@@ -120,9 +121,9 @@ cp .env.example .env
 - DB_DATABASE=laravel
 - DB_USERNAME=<your_username>
 - DB_PASSWORD=<your_password>
-- CACHE_DRIVER=<file or redis>
-- QUEUE_CONNECTION=<sync or redis>
-- SESSION_DRIVER=<file or redis>
+- CACHE_DRIVER=redis
+- QUEUE_CONNECTION=redis
+- SESSION_DRIVER=redis
 - JWT_SECRET=<your_jwt_secret>
 
 ### 3. Build and start all services
