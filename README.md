@@ -74,9 +74,9 @@ php artisan jwt:secret
 - DB_DATABASE=laravel
 - DB_USERNAME=<your_username>
 - DB_PASSWORD=<your_password>
-- CACHE_DRIVER=<file or redis>
-- QUEUE_CONNECTION=<sync or redis>
-- SESSION_DRIVER=<file or redis>
+- CACHE_DRIVER=redis
+- QUEUE_CONNECTION=redis
+- SESSION_DRIVER=redis
 - JWT_SECRET=<your_jwt_secret>
 
 ### 7. Run migrations
