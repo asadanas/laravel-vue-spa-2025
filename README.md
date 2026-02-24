@@ -1,71 +1,150 @@
-# Laravel-Vue SPA 
+# Laravel-Vue SPA
 
-<a href="https://github.com/cretueusebiu/laravel-vue-spa/actions"><img src="https://github.com/cretueusebiu/laravel-vue-spa/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/cretueusebiu/laravel-vue-spa"><img src="https://poser.pugx.org/cretueusebiu/laravel-vue-spa/d/total.svg" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/cretueusebiu/laravel-vue-spa"><img src="https://poser.pugx.org/cretueusebiu/laravel-vue-spa/v/stable.svg" alt="Latest Stable Version"></a>
-
-> A Laravel-Vue SPA starter kit.
-
-<p align="center">
-<img src="https://i.imgur.com/NHFTsGt.png">
-</p>
+> A production-ready Single Page Application built with Laravel 8 (API backend) and Vue.js (frontend), fully containerized with Docker.
 
 ## Features
 
-- Laravel 8
-- Vue + VueRouter + Vuex + VueI18n + ESlint
-- Pages with dynamic import and custom layouts
-- Login, register, email verification and password reset
-- Authentication with JWT
-- Socialite integration
-- Bootstrap 5 + Font Awesome 5
+- Full-Stack SPA: Laravel REST API + Vue.js frontend
+- Dockerized: Multi-stage production Dockerfile + docker-compose for local testing
+- Redis Ready: PHP Redis extension pre-installed
+- Security: Non-root user (www-data), Alpine-based minimal images
+- Nginx Proxy: Production-ready reverse proxy configuration
 
-## Installation
+## What Was Added (Docker Layer)
+The following files/folders were added by @asadanas (Md. Asaduzzaman Anas) to enable containerization:
 
-- `composer create-project --prefer-dist cretueusebiu/laravel-vue-spa`
-- Edit `.env` and set your database connection details
-- (When installed via git clone or download, run `php artisan key:generate` and `php artisan jwt:secret`)
-- `php artisan migrate`
-- `npm install`
+laravel-vue-spa-2025/
+├── Dockerfile                    # Multi-stage production build
+├── docker-compose.yml            # Local development orchestration
+├── .dockerignore                 # Exclude files from Docker context
+├── docker/
+│   ├── entrypoint.sh             # Container startup script (cache clear, migrations)
+│   └── nginx/
+│       └── default.conf          # Nginx reverse proxy config (FastCGI to PHP-FPM)
+└── README.md                     # This installation guide
 
-## Usage
+# All other files belong to the original https://github.com/cretueusebiu/laravel-vue-spa.git repository.
 
-#### Development
+## Installation Guide
 
+## Option 1: Traditional Installation (Without Docker)
+
+Use this method if you prefer to run Laravel/Vue directly on your host machine.
+
+## Prerequisites
+Choose one of the two methods below to install the application in your test environment.
+
+- PHP 8.2 with extensions
+- Composer
+- Node.js 16 & npm
+- MySQL 8.0
+
+## Step-by-Step Setup
+# 1. Clone the repository
 ```bash
-npm run dev
+git clone https://github.com/asadanas/laravel-vue-spa-2025.git
+cd laravel-vue-spa-2025
 ```
-
-#### Production
-
+# 2. Copy environment file
 ```bash
+cp .env.example .env
+```
+# 3. Install PHP dependencies
+```bash
+composer install
+```
+# 4. Install JavaScript dependencies
+```bash
+npm install
+```
+# 5. Generate application key and JWT secret
+```bash
+php artisan key:generate
+```
+```bash
+php artisan jwt:secret
+```
+# 6. Configure your database & other necessary environments in .env
+# Edit these lines in .env:
+- APP_KEY=<your_app_key>
+- DB_CONNECTION=mysql
+- DB_HOST=127.0.0.1
+- DB_PORT=3306
+- DB_DATABASE=laravel
+- DB_USERNAME=<your_username>
+- DB_PASSWORD=<your_password>
+- CACHE_DRIVER=<file or redis>
+- QUEUE_CONNECTION=<sync or redis>
+- SESSION_DRIVER=<file or redis>
+- JWT_SECRET=<your_jwt_secret>
+
+# 7. Run migrations
+```bash
+php artisan migrate --force
+```
+# 9. Compile frontend assets
+```bash
+npm ci --no-audit --no-fund
 npm run build
 ```
-
-## Socialite
-
-This project comes with GitHub as an example for [Laravel Socialite](https://laravel.com/docs/5.8/socialite).
-
-To enable the provider create a new GitHub application and use `https://example.com/api/oauth/github/callback` as the Authorization callback URL.
-
-Edit `.env` and set `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` with the keys form your GitHub application.
-
-For other providers you may need to set the appropriate keys in `config/services.php` and redirect url in `OAuthController.php`.
-
-## Email Verification
-
-To enable email verification make sure that your `App\User` model implements the `Illuminate\Contracts\Auth\MustVerifyEmail` contract.
-
-## Testing
-
+# 10. Start the development server
 ```bash
-# Run unit and feature tests
-vendor/bin/phpunit
+php artisan serve --host=<Interface_IP or localhost> --port=8080
+```
+# 11. Access the application
+# Frontend: http://<Interface_IP or localhost>:8000
 
-# Run Dusk browser tests
-php artisan dusk
+## Option 2: Docker Installation (Recommended)
+Use this method for a consistent, isolated environment that matches production.
+
+## Prerequisites
+Install Docker & Docker Compose by following link. 
+
+https://docs.docker.com/engine/install/
+
+## Step-by-Step Setup
+# 1. Clone the repository
+```bash
+git clone https://github.com/asadanas/laravel-vue-spa-2025.git
+cd laravel-vue-spa-2025
+```
+# 2. Copy environment template
+```bash
+cp .env.example .env
+```
+# Edit these lines in .env:
+- APP_KEY=<your_app_key>
+- DB_CONNECTION=mysql
+- DB_HOST=127.0.0.1
+- DB_PORT=3306
+- DB_DATABASE=laravel
+- DB_USERNAME=<your_username>
+- DB_PASSWORD=<your_password>
+- CACHE_DRIVER=<file or redis>
+- QUEUE_CONNECTION=<sync or redis>
+- SESSION_DRIVER=<file or redis>
+- JWT_SECRET=<your_jwt_secret>
+
+# 3. Build and start all services
+# Dependencies are installed during build (no manual composer/npm needed)
+# Migrations run automatically if RUN_MIGRATIONS=true into docker-compose yaml. 
+```bash
+docker compose up -d --build
+```
+# 4. Wait for services to be healthy (30-60 seconds)
+```bash
+docker compose ps
+```
+# Expected: app, nginx, db, redis all show "Up (healthy)"
+
+# 5. Access the application
+# Frontend: http://<Interface_IP>:8080
+
+# 6. Remove all the services
+```bash
+docker compose down -v
 ```
 
-## Changelog
-
-Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.
+## Attribution
+# Original Project
+This application is built upon the laravel-vue-spa https://github.com/cretueusebiu/laravel-vue-spa.git repository by @cretueusebiu (Eusebiu Cretu).
