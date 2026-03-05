@@ -1,0 +1,111 @@
+name: Docker Build & Push (App + Nginx)
+
+on:
+  push:
+    branches:
+      - dev
+      - stage
+      - prod
+      - main
+      - master
+  workflow_dispatch:
+
+# Security: Least Privilege Permissions
+permissions:
+  contents: read
+  packages: write
+
+# Concurrency: Cancel redundant runs on same branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Update with your Docker Hub username
+  IMAGE_APP: ${{ secrets.DOCKERHUB_USERNAME }}/admin-app
+  IMAGE_NGINX: ${{ secrets.DOCKERHUB_USERNAME }}/admin-nginx
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Calculate Version & Tags
+        id: meta
+        run: |
+          BRANCH="${{ github.ref_name }}"
+          SHA="${{ github.sha }}"
+          SHA_SHORT="${SHA:0:7}"
+          
+          # Read VERSION file
+          if [ -f VERSION ]; then
+            BASE_VER=$(cat VERSION | tr -d '[:space:]')
+          else
+            BASE_VER="1.0.0"
+          fi
+
+          # Environment tag based on branch
+          case "$BRANCH" in
+            prod|main|master) ENV_TAG="latest" ;;
+            *) ENV_TAG="$BRANCH" ;;
+          esac
+
+          # Unique version: SemVer-Branch-SHA
+          UNIQUE_VERSION="${BASE_VER}-${ENV_TAG}-${SHA_SHORT}"
+
+          echo "unique_version=${UNIQUE_VERSION}" >> $GITHUB_OUTPUT
+          echo "env_tag=${ENV_TAG}" >> $GITHUB_OUTPUT
+          echo "base_ver=${BASE_VER}" >> $GITHUB_OUTPUT
+
+          echo "================================================="
+          echo "Base Version   : ${BASE_VER}"
+          echo "Branch         : ${BRANCH}"
+          echo "Unique Tag     : ${UNIQUE_VERSION}"
+          echo "Env Alias      : ${ENV_TAG}"
+          echo "================================================="
+
+      - name: Build & Push App Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          target: app
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          tags: |
+            ${{ env.IMAGE_APP }}:${{ steps.meta.outputs.unique_version }}
+            ${{ env.IMAGE_APP }}:${{ steps.meta.outputs.env_tag }}
+            ${{ env.IMAGE_APP }}:latest
+          build-args: |
+            BUILD_VERSION=${{ steps.meta.outputs.base_ver }}
+            GIT_SHA=${{ github.sha }}
+          platforms: linux/amd64
+
+      - name: Build & Push Nginx Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          target: nginx
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          tags: |
+            ${{ env.IMAGE_NGINX }}:${{ steps.meta.outputs.unique_version }}
+            ${{ env.IMAGE_NGINX }}:${{ steps.meta.outputs.env_tag }}
+            ${{ env.IMAGE_NGINX }}:latest
+          platforms: linux/amd64
