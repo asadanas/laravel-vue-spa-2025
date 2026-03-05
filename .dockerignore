@@ -1,9 +1,50 @@
+# Git
+.git
+.gitignore
+.github
+
+# IDE & Editor
+.vscode
+.idea
+*.swp
+*.swo
+
+# Documentation
+*.md
+LICENSE
+CHANGELOG.md
+
+# Docker
+.dockerignore
+Dockerfile
+Dockerfile-dev
+docker-compose*.yml
+
+# Dependencies (will be installed in container)
 node_modules
 vendor
-.git
+
+# Tests
+tests
+phpunit.xml
+
+# Environment & Secrets
 .env
+.env.*
+*.env
+storage/*.key
+my.cnf
 
-bootstrap/cache/*.php
-storage/framework/*
+# Logs & Cache
 storage/logs/*
+!storage/logs/.gitkeep
+bootstrap/cache/*
+!bootstrap/cache/.gitkeep
 
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Backup Files
+*-bk
+*.bak
