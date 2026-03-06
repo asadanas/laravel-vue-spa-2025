@@ -30,7 +30,7 @@ laravel-vue-spa-2025/
 > All other files belong to the original https://github.com/cretueusebiu/laravel-vue-spa.git repository.
 
 <details>
-<summary> Reference: How The Original Repo Was Dockerized</summary>
+<summary> Reference: How The Original Repo Was Dockerized. How to Install the Application with Docker & also without Docker. </summary>
 
 > Skip this if you cloned this repository.
 > This section shows how Docker files were added to the original `laravel-vue-spa` codebase.
