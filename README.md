@@ -76,7 +76,7 @@ git add .
 git commit -m "Add Docker support with multi-stage builds"
 git push origin <branch_name>
 ```
-## Installation Guide
+# Installation Guide
 
 Choose one of the two methods below to install the application in your test environment.
 
