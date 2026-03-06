@@ -9,22 +9,73 @@
 - Redis Ready: PHP Redis extension pre-installed
 - Security: Non-root user (www-data), Alpine-based minimal images
 - Nginx Proxy: Production-ready reverse proxy configuration
+- CI/CD: Automated Docker builds with versioning via GitHub Actions
 
-## What Was Added (Docker Layer)
+## What Was Added
 The following files/folders were added by @asadanas (Md. Asaduzzaman Anas) to enable containerization:
 ```
 laravel-vue-spa-2025/
-├── Dockerfile                    # Multi-stage production build
-├── docker-compose.yml            # Local development orchestration
-├── .dockerignore                 # Exclude files from Docker context
+├── Dockerfile              # Multi-stage production build
+├── docker-compose.yml      # Local development orchestration
+├── .dockerignore           # Exclude files from Docker context
 ├── docker/
-│   ├── entrypoint.sh             # Container startup script (cache clear, migrations)
-│   └── nginx/
-│       └── default.conf          # Nginx reverse proxy config (FastCGI to PHP-FPM)
-└── README.md                     # This installation guide
+│ ├── entrypoint.sh         # Container startup script (cache clear, migrations)
+│ └── nginx/
+│ └── default.conf          # Nginx reverse proxy config (FastCGI to PHP-FPM)
+├── .github/workflows/
+│ └── docker-build.yml      # GitHub Actions CI/CD workflow
+├── VERSION                 # Semantic version file for image tagging
+└── README.md               # This installation guide
 ```
 > All other files belong to the original https://github.com/cretueusebiu/laravel-vue-spa.git repository.
 
+<details>
+<summary> Reference: How This Repo Was Dockerized</summary>
+
+> Skip this if you cloned this repository.
+> This section shows how Docker files were added to the original `laravel-vue-spa` codebase.
+
+### Original Repo
+https://github.com/cretueusebiu/laravel-vue-spa
+
+### Step 1: Clone the Original Repository
+```bash
+git clone https://github.com/cretueusebiu/laravel-vue-spa.git <project-folder-name>
+cd <project-folder-name>
+
+### 2: Create the Dockerfile
+```bash
+vim Dockerfile
+```
+Paste the multi-stage Dockerfile content here. 
+### 3: Create docker-compose.yml
+```bash
+vim docker-compose.yml
+```
+Paste the docker compose config here.
+### 4: Create .dockerignore
+```bash
+vim .dockerignore
+```
+Paste the file or folder to ignore.  
+### 5: Create docker/entrypoint.sh
+```bash
+mkdir -p docker
+vim docker/entrypoint.sh
+```
+Paste the startup script here. 
+### 6: Create docker/nginx/default.conf
+```bash
+mkdir -p docker/nginx
+vim docker/nginx/default.conf
+```
+Paste the Nginx config here. 
+### 7: Commit Everything
+```bash
+git add .
+git commit -m "Add Docker support with multi-stage builds"
+git push origin <branch_name>
+```
 ## Installation Guide
 
 Choose one of the two methods below to install the application in your test environment.
@@ -93,7 +144,7 @@ npm run build
 php artisan serve --host=<Interface_IP or localhost> --port=8080
 ```
 ### 11. Access the application
-Frontend: http://<Interface_IP or localhost>:8000
+Frontend: http://<Interface_IP or localhost>:8080
 
 # Option 2: Docker Installation (Recommended)
 Use this method for a consistent, isolated environment that matches production.
@@ -146,7 +197,62 @@ Frontend: http://<Interface_IP>:8080
 docker compose down -v
 ```
 
+# CI/CD with GitHub Actions
+This repository handles building and publishing Docker images via GitHub Actions. 
+
+### How to Add the Workflow to GitHub
+1. Create the workflow directory (if it doesn't exist):
+```bash
+mkdir -p .github/workflows
+```
+2. Create the workflow file:
+```bash
+vim .github/workflows/docker-build.yml
+```
+3. Paste the workflow YAML into .github/workflows/docker-build.yml
+4. Commit and push:
+```bash
+git add .github/workflows/docker-build.yml
+git commit -m "Add GitHub Actions workflow for Docker builds"
+git push origin <branch_name>
+```
+5. Verify: Go to your GitHub repo → Actions tab → You should see the workflow running.
+
+### Create the VERSION file in your repository root:
+```bash
+echo "1.0.0" > VERSION
+git add VERSION
+git commit -m "Add VERSION file for image tagging"
+git push origin <branch_name>
+```
+### Required Secrets
+Configure these in GitHub Repo → Settings → Secrets → Actions:
+```bash
+DOCKERHUB_USERNAME     # Your Docker Hub username
+DOCKERHUB_TOKEN        # Docker Hub Personal Access Token (with write permission)
+```
+### Version Management
+1. Update the VERSION file in this repo (e.g., 1.0.0 → 1.1.0)
+2. Commit and push to trigger a new build
+
+### What This Workflow Does
+Build: Compiles Laravel + Vue app into Docker images
+Push: Uploads admin-app and admin-nginx to Docker Hub
+Tag: Applies versioning tag for every Image
+
+# Deployment: Kubernetes + GitOps
+Deployment is managed via GitOps in a separate repository using Helm and ArgoCD.
+### Kubernetes Manifests & Deployment Guide:
+https://github.com/asadanas/k8s-manifests
+
+### Quick Deployment Flow:
+1. Push code → GitHub Actions builds & pushes images
+2. Update image tag in apps/laravel-vue-app/values-production.yaml
+3. ArgoCD auto-syncs changes to your Kubernetes cluster
+
 ## Attribution
 ### Original Project
 This application is built upon the laravel-vue-spa https://github.com/cretueusebiu/laravel-vue-spa.git repository by @cretueusebiu (Eusebiu Cretu).
+### Docker & CI/CD Enhancements
+Containerization and GitHub Actions workflow added by @asadanas (Md. Asaduzzaman Anas).
 
