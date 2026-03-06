@@ -30,7 +30,7 @@ laravel-vue-spa-2025/
 > All other files belong to the original https://github.com/cretueusebiu/laravel-vue-spa.git repository.
 
 <details>
-<summary> Reference: How This Repo Was Dockerized</summary>
+<summary> Reference: How The Original Repo Was Dockerized</summary>
 
 > Skip this if you cloned this repository.
 > This section shows how Docker files were added to the original `laravel-vue-spa` codebase.
@@ -42,7 +42,7 @@ https://github.com/cretueusebiu/laravel-vue-spa
 ```bash
 git clone https://github.com/cretueusebiu/laravel-vue-spa.git <project-folder-name>
 cd <project-folder-name>
-
+```
 ### 2: Create the Dockerfile
 ```bash
 vim Dockerfile
