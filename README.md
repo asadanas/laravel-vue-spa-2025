@@ -39,60 +39,13 @@ laravel-vue-spa-2025/
 > All other files belonged to the original https://github.com/cretueusebiu/laravel-vue-spa.git repository.
 
 ## Documentation Overview:
-1. How Docker support was added to the original `laravel-vue-spa` repository
-2. Installing the application without Docker (traditional setup)
+1. Installing the application without Docker (traditional setup)
+2. How Docker support was added to the original `laravel-vue-spa` repository
 3. Installing the application with Docker
 4. CI/CD automation using GitHub Actions
 5. Deployment to Kubernetes using Helm and ArgoCD (GitOps)
 
-## How Docker Support Was Added to the Original Repository
-
-### Original Repo
-https://github.com/cretueusebiu/laravel-vue-spa
-
-### Step 1: Clone the Original Repository
-```bash
-git clone https://github.com/cretueusebiu/laravel-vue-spa.git laravel-vue-spa-2025
-cd laravel-vue-spa-2025
-```
-### 2: Create the Dockerfile
-```bash
-vim Dockerfile
-```
-Paste the multi-stage Dockerfile content here. 
-### 3: Create docker-compose.yml
-```bash
-vim docker-compose.yml
-```
-Paste the docker compose config here.
-### 4: Create .dockerignore
-```bash
-vim .dockerignore
-```
-Paste the file or folder to ignore.  
-### 5: Create docker/entrypoint.sh
-```bash
-mkdir -p docker
-vim docker/entrypoint.sh
-```
-Paste the startup script here. 
-### 6: Create docker/nginx/default.conf
-```bash
-mkdir -p docker/nginx
-vim docker/nginx/default.conf
-```
-Paste the Nginx config here. 
-### 7: Commit Everything
-```bash
-git add .
-git commit -m "Add Docker support with multi-stage builds"
-git push origin master
-```
-# Installation Guide
-
-Choose one of the two methods below to install the application in your test environment.
-
-# Option 1: Traditional Installation (Without Docker)
+# Installing the application without Docker (traditional setup)
 
 Use this method if you prefer to run Laravel/Vue directly on your host machine.
 
@@ -159,7 +112,51 @@ php artisan serve --host=<Interface_IP or localhost> --port=8080
 ### 10. Access the application
 Frontend: http://<Interface_IP or localhost>:8080
 
-# Option 2: Docker Installation (Recommended)
+# How Docker Support Was Added to the Original Repository
+
+### Original Repo
+https://github.com/cretueusebiu/laravel-vue-spa
+
+### Step 1: Clone the Original Repository
+```bash
+git clone https://github.com/cretueusebiu/laravel-vue-spa.git laravel-vue-spa-2025
+cd laravel-vue-spa-2025
+```
+### 2: Create the Dockerfile
+```bash
+vim Dockerfile
+```
+Paste the multi-stage Dockerfile content here. 
+### 3: Create docker-compose.yml
+```bash
+vim docker-compose.yml
+```
+Paste the docker compose config here.
+### 4: Create .dockerignore
+```bash
+vim .dockerignore
+```
+Paste the file or folder to ignore.  
+### 5: Create docker/entrypoint.sh
+```bash
+mkdir -p docker
+vim docker/entrypoint.sh
+```
+Paste the startup script here. 
+### 6: Create docker/nginx/default.conf
+```bash
+mkdir -p docker/nginx
+vim docker/nginx/default.conf
+```
+Paste the Nginx config here. 
+### 7: Commit Everything
+```bash
+git add .
+git commit -m "Add Docker support with multi-stage builds"
+git push origin master
+```
+
+# Installing the application with Docker
 Use this method for a consistent, isolated environment that matches production.
 
 ### Prerequisites
